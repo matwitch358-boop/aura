@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<style>
+:root{
+  --spring-open:linear(0, 0.0171, 0.0621, 0.1268, 0.2043, 0.2888, 0.376, 0.4624, 0.5453, 0.6228, 0.6938, 0.7575, 0.8137, 0.8622, 0.9034, 0.9377, 0.9658, 0.9881, 1.0053, 1.0182, 1.0274, 1.0334, 1.0369, 1.0383, 1.0381, 1.0368, 1.0345, 1.0317, 1.0285, 1.0252, 1.0218, 1.0186, 1.0155, 1.0127, 1.0102, 1.0079, 1.0059, 1.0043, 1.0028, 1.0017, 1.0007, 1, 0.9995, 0.9991, 0.9988, 0.9986, 0.9985, 0.9985, 1);
+  --spring-close:linear(0, 0.0196, 0.0684, 0.1344, 0.2093, 0.2872, 0.3643, 0.438, 0.5068, 0.5698, 0.6268, 0.6777, 0.7228, 0.7625, 0.7971, 0.8272, 0.8532, 0.8755, 0.8947, 0.9111, 0.9251, 0.937, 0.9471, 0.9556, 0.9628, 0.9689, 0.974, 0.9783, 0.9819, 0.9849, 0.9874, 0.9895, 0.9913, 0.9928, 0.994, 0.995, 0.9959, 0.9966, 0.9972, 0.9977, 0.9981, 0.9984, 0.9987, 0.9989, 0.9991, 0.9993, 0.9994, 0.9995, 1);
+  --bg:#000;--fg:#fff;--muted:#8e8e93;--tile:#1c1c1e;--line:rgba(255,255,255,.08);--accent:#fff;
+}
+[data-theme=light]{--bg:#f5f5f7;--fg:#1d1d1f;--muted:#6e6e73;--tile:#e5e5ea;--line:rgba(0,0,0,.08);--accent:#1d1d1f}
+*{box-sizing:border-box;margin:0;user-select:none;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:transparent;overflow:hidden;color:var(--fg);
+  font:13px/1.25 "SF Pro Text","SF Pro Display","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+.stage{display:flex;justify-content:center}
+
+.island{
+  position:relative;width:170px;height:38px;border-radius:19px;overflow:hidden;cursor:pointer;
+  background:var(--bg);box-shadow:0 0 0 .5px var(--line),0 8px 24px rgba(0,0,0,.28);
+  transition:width .6s var(--spring-close),height .6s var(--spring-close),border-radius .6s var(--spring-close),
+             background-color .35s ease,transform .35s cubic-bezier(.2,.8,.2,1);
+  will-change:width,height;
+}
+.island.compact:hover{transform:scale(1.03)}
+.island.compact:active{transform:scale(.97)}
+.island.open{width:430px;height:200px;border-radius:38px;cursor:default;
+  transition:width .62s var(--spring-open),height .62s var(--spring-open),border-radius .62s var(--spring-open),background-color .35s ease}
+
+/* компактный режим */
+.compact-row{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 15px 0 14px;
+  transition:opacity .22s ease .1s,transform .45s cubic-bezier(.2,.8,.2,1),filter .3s ease .05s}
+.logo{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.1em}
+.mark{width:14px;height:14px;border-radius:50%;border:1.6px solid var(--fg);position:relative}
+.mark::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--fg)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:breathe 3.2s ease-in-out infinite}
+.dot.off{background:#636366;animation:none}
+@keyframes breathe{50%{opacity:.45}}
+.island.open .compact-row{opacity:0;transform:scale(.94);filter:blur(4px);pointer-events:none;transition:opacity .14s ease,transform .3s ease,filter .2s ease}
+
+/* раскрытый режим */
+.panel{position:absolute;left:0;top:0;width:430px;height:200px;padding:22px 24px 22px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.island.open .panel{pointer-events:auto}
+.panel>*{opacity:0;transform:translateY(8px) scale(.97);filter:blur(8px);
+  transition:opacity .16s ease,transform .25s ease,filter .2s ease}
+.island.open .panel>*{opacity:1;transform:none;filter:none;
+  transition:opacity .4s ease calc(.12s + var(--i)*.05s),transform .55s cubic-bezier(.2,.8,.2,1) calc(.12s + var(--i)*.05s),filter .4s ease calc(.12s + var(--i)*.05s)}
+
+.head{display:flex;justify-content:space-between;align-items:flex-start}
+.time{font:600 42px/1 "SF Pro Display","Segoe UI Variable Display","Segoe UI",sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.date{color:var(--muted);margin-top:6px;font-size:13px;text-transform:capitalize}
+.btns{display:flex;gap:8px}
+.circle{width:32px;height:32px;border-radius:50%;border:0;background:var(--tile);color:var(--fg);display:grid;place-items:center;cursor:pointer;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.circle:hover{opacity:.8}.circle:active{transform:scale(.9)}
+.circle svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.tiles{display:flex;gap:10px}
+.tile{flex:1;background:var(--tile);border-radius:20px;padding:12px 14px;height:70px;display:flex;flex-direction:column;justify-content:space-between}
+.tile small{color:var(--muted);font-size:11px;font-weight:500}
+.val{font-size:17px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:baseline;gap:6px}
+.val span{color:var(--muted);font-size:11px;font-weight:500}
+.bar{height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:2px;background:var(--fg);transition:width .8s cubic-bezier(.2,.8,.2,1)}
+</style></head>
+<body>
+<div class="stage">
+  <div class="island compact" id="island">
+    <div class="compact-row">
+      <div class="logo"><div class="mark"></div>AURA</div>
+      <div class="dot" id="dot"></div>
+    </div>
+    <div class="panel">
+      <div class="head" style="--i:0">
+        <div><div class="time" id="time">--:--</div><div class="date" id="date"></div></div>
+        <div class="btns">
+          <button class="circle" id="theme" aria-label="Тема"><svg id="themeIcon" viewBox="0 0 24 24"></svg></button>
+          <button class="circle" id="close" aria-label="Свернуть"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+        </div>
+      </div>
+      <div class="tiles" style="--i:1">
+        <div class="tile"><small>Батарея</small>
+          <div class="val"><b id="batt">—</b><span id="chg"></span></div>
+          <div class="bar"><i id="battbar"></i></div></div>
+        <div class="tile"><small>Сеть</small>
+          <div class="val"><b id="net">—</b></div>
+          <div class="val"><span id="netsub"></span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const island = $('island');
+let idleTimer, hovering = false;
+
+island.addEventListener('mouseenter', () => { hovering = true; aura.ignoreMouse(false); clearTimeout(idleTimer); });
+island.addEventListener('mouseleave', () => { hovering = false; aura.ignoreMouse(true); armIdle(); });
+island.addEventListener('mousemove', armIdle);
+
+function armIdle(){ clearTimeout(idleTimer); if (island.classList.contains('open')) idleTimer = setTimeout(() => !hovering && collapse(), 6000); }
+function expand(){ if (island.classList.contains('open')) return; island.classList.replace('compact','open'); update(); armIdle(); }
+function collapse(){ if (!island.classList.contains('open')) return; island.classList.replace('open','compact'); clearTimeout(idleTimer); }
+
+island.addEventListener('click', () => expand());
+$('close').addEventListener('click', e => { e.stopPropagation(); collapse(); });
+addEventListener('keydown', e => e.key === 'Escape' && collapse());
+aura.onExpand(expand);
+
+const ICON_MOON = '<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>';
+const ICON_SUN  = '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>';
+function applyTheme(t){ document.documentElement.dataset.theme = t; $('themeIcon').innerHTML = t === 'light' ? ICON_SUN : ICON_MOON; }
+$('theme').addEventListener('click', e => {
+  e.stopPropagation();
+  const t = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  applyTheme(t); aura.setSettings({ theme: t });
+});
+
+function update(){
+  const d = new Date();
+  $('time').textContent = d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  $('date').textContent = d.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
+  const on = navigator.onLine;
+  $('net').textContent = on ? 'Онлайн' : 'Офлайн';
+  $('netsub').textContent = on ? 'Подключено' : 'Нет подключения';
+  $('dot').classList.toggle('off', !on);
+}
+async function battery(){
+  try{
+    const b = await navigator.getBattery();
+    const set = () => {
+      $('batt').textContent = Math.round(b.level*100)+'%';
+      $('chg').textContent = b.charging ? 'Заряжается' : 'От батареи';
+      $('battbar').style.width = b.level*100+'%';
+    };
+    set(); b.addEventListener('levelchange',set); b.addEventListener('chargingchange',set);
+  }catch{ $('batt').textContent = '—'; $('chg').textContent = 'Недоступно'; }
+}
+addEventListener('online',update); addEventListener('offline',update);
+setInterval(update, 1000);
+aura.getSettings().then(s => applyTheme(s.theme || 'dark'));
+applyTheme('dark'); update(); battery();
+</script>
+</body></html>

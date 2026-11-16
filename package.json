@@ -1,0 +1,38 @@
+{
+  "name": "aura",
+  "version": "0.2.0",
+  "description": "AURA — Dynamic Island for Windows",
+  "author": "AURA",
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "app.aura.island",
+    "productName": "AURA",
+    "copyright": "AURA",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["main.js", "preload.js", "index.html", "assets/**/*", "package.json"],
+    "asar": true,
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AURA",
+      "artifactName": "AURA-Setup.exe",
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}
